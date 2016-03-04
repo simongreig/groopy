@@ -1,0 +1,25 @@
+<div class="main_content" ng-show="!details">
+  <div class="splash"><div class="splash-inner">Contacting Flickr</div></div>
+
+</div>
+
+<div class="main_content" ng-show="details">
+
+  <div ng-repeat="(key, value) in details.photos.photo">
+
+    <div class="bgimg" style="background:url({{value.url_q}})">
+
+
+      <div id="{{value.id}}" ng-click="clickBox(value.id)" ng-show="isShowBox(value.id)" ng-class="getBoxClass(value.id)"> </div>
+
+      <div class="tltxt" ng-show="isShowBox(value.id)">{{currGroup[value.id]}}</div>
+      <div class="trtxt" ng-show="isShowBox(value.id)">{{nextGroup[value.id]}}</div>
+
+      <div class="bltxt">{{value.views}}</div>
+
+
+      <div class="waiting" ng-show="isShowWait(value.id)"> <div class="inner"><img src="spinner.gif" width="20px" height="20px"></div> </div>
+
+    </div>
+  </div>
+</div>

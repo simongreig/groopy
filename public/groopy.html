@@ -1,0 +1,62 @@
+<!doctype html>
+<html ng-app="groopyApp" ng-controller="GroopyController">
+  <head>
+    <title>Flickr Groopy v2</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.js"></script>
+    <script src="groopy.js"></script>
+    <link rel="stylesheet" href="groopy.css">
+  </head>
+  <body>
+    <div class="banner"> </div>
+
+    <div class="content">
+      <ul class="search-bar">
+
+        <li class="logo"><img src="groopy.png"></li>
+
+        <li class="nav">
+          <select class="sort-input" ng-model="sort" ng-options="item.label for item in sortItems track by item.api">
+          </select>
+        </li>
+
+        <li class="nav">
+          <select class="group-input" ng-model="group" ng-options="item.label for item in poolItems track by item.id">
+          </select>
+        </li>
+
+
+        <li class="nav"><input type="text"
+               class="search-input"
+               ng-model="search"
+               ng-model-options="{ debounce: 800 }"
+               placeholder="Tags or labels" /></li>
+
+
+      </ul>
+
+
+
+      <div id="grid-info"
+           ng-include="'grid.html'">
+      </div>
+
+
+      <div class="pages" ng-show="details">
+      <!--    <div ng-if="{{details.photos.prev}}"><a href="{{details.photos.prev}}">&lt;</a></div>  -->
+          <div><input type="number"
+                 class="page-input"
+                 min="1"
+                 step="1"
+                 required="true"
+                 ng-model="page"
+                 ng-model-options="{ debounce: 800 }"
+                 placeholder="Page" /> of {{details.photos.pages}}</div>
+      <!--     <div ng-if="{{details.photos.prev}}"><a href="{{details.photos.next}}">&gt;</a></div>  -->
+      </div>
+
+      <div>{{debug}}</div>
+    </div>
+
+  </body>
+</html>

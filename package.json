@@ -1,0 +1,21 @@
+{
+  "name": "groopy_web_app",
+  "version": "0.0.1",
+  "description": "Groopy app",
+  "author": "Simon Greig <simon.greig@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js cf"
+  },
+  "dependencies": {
+    "cfenv": "^1.0.3",
+    "cookie-parser": "^1.4.1",
+    "express": "^4.13.4",
+    "grant-express": "^3.5.5",
+    "purest": "^2.0.1"
+  },
+  "repository": {},
+  "engines": {
+    "node": "4.2.x"
+  }
+}
