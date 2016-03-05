@@ -1,6 +1,11 @@
 'use strict';
 
 const express = require('express');
+var session = require('express-session');
+var Grant = require('grant-express');
+var cookieParser = require('cookie-parser');
+var Purest = require('purest');
+
 
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
@@ -10,40 +15,53 @@ var cfenv = require('cfenv');
 var appEnv = cfenv.getAppEnv();
 
 
-// TODO this needs to be replaced with a manual config load in order to unlink flickrOptions with the .env file.
 var habitat = require("habitat"),
     env = habitat.load('.env'),
-    Flickr = require("flickrapi"),
     flickrOptions = env.get("FLICKR");
 
-
-// This is the version that requires a reauth every execution.
-var Flickr = require("flickrapi") ;
-var flickrOptions = {
-  api_key: "6d742277929e0f153206a8af201e5962",
-  secret: "1d0b18e0ccaaaecf",
-  permissions: "write",
-  nobrowser: "true",
-  callback: appEnv.url + "/auth"
-};
-
-// TODO fix this properly but need to make sure it says HTTP and not HTTPS.
-if (flickrOptions.callback.search("https") != -1 ) {
-  flickrOptions.callback = flickrOptions.callback.replace ("https", "http");
+flickrOptions.host = appEnv.url;
+// TODO fix this properly but need to strip off the HTTP or HTTPS.
+if (flickrOptions.host.search("https") != -1 ) {
+  flickrOptions.host = flickrOptions.host.replace ("https://", "");
 }
-console.log ("Loaded options", flickrOptions);
+if (flickrOptions.host.search("http") != -1 ) {
+  flickrOptions.host = flickrOptions.host.replace ("http://", "");
+}
 
-
-    // TODO.  Need to store the secret in the session cookie rather than the .env file.
-    // Probably just over write it here with the session cookie data:
-    // flickrOptions.access_token_secret = from the cookie
-    // flickrOptions.access_token = from the cookie
-    // flickrOptions.user_id = from the cookie
-
+console.log ("Loaded options:", flickrOptions);
 
 
 // Constants
 const PORT = 8080;
+
+
+// Load the Grant and Purest libraries used for auth and comms.
+var grant = new Grant (
+  {
+    "server": {
+    "protocol": flickrOptions.protocol,
+    "host": flickrOptions.host,
+    "callback": flickrOptions.callback,
+    "transport": "querystring",
+    "state": false   // Not needed for OAUTH1
+    },
+    "flickr": {
+      "key": flickrOptions.api_key,
+      "secret": flickrOptions.api_secret,
+      "scope": [flickrOptions.permissions]
+    }
+  }
+);
+
+var flickr = new Purest({
+  provider:'flickr',
+  key: flickrOptions.api_key,
+  secret: flickrOptions.api_secret}) ;
+
+
+
+
+
 
 
 // App
@@ -63,192 +81,246 @@ process.argv.forEach(function (val, index, array) {
 app.use(express.static(__dirname + '/public'));
 
 
+app.use(session({secret: flickrOptions.session_secret}));
+app.use(grant);
+app.use(cookieParser());
 
-// Run a search
+
+
+//******************************************************************************
+//
+// This route only exists in order to quickly test the Flickr API is working
+//
+//******************************************************************************
+app.get('/flickr_test', function (req, res) {
+  // call flickr.test.login
+  flickr.get('?method=flickr.test.login', {
+    oauth:{token: req.cookies.groopy_access_token, secret: req.cookies.groopy_access_secret},
+    qs:{api_key:flickrOptions.api_key}
+  },function (err, inres, body) {
+    if (err) {
+      res.end(JSON.stringify(err));
+    } else {
+      res.end(JSON.stringify(body));
+    }
+  });
+});
+
+
+//******************************************************************************
+//
+// The authentication call back once the call to the server is complete.
+// All it does is store the access toke and secret in the cookie.
+//
+//******************************************************************************
+app.get('/authcallback', function (req, res) {
+  // TODO this should be one cookie storing an object.
+  console.log(req.query);
+  res.cookie('groopy_access_token' , req.query.access_token);
+  res.cookie('groopy_access_secret', req.query.access_secret);
+  res.cookie('groopy_user_id', req.query.raw.user_nsid);
+  res.redirect(flickrOptions.post_auth_redirect);
+});
+
+
+//******************************************************************************
+//
+// Logs out the user by deleting the session cookie.
+//
+//******************************************************************************
+app.get('/logout', function(req,res){
+  // TODO this should be one cookie storing an object.
+  res.clearCookie('groopy_access_token');
+  res.clearCookie('groopy_access_secret');
+  res.clearCookie('groopy_user_id');
+  res.send('Logged out');
+});
+
+
+
+
+//******************************************************************************
+//
+// Run a search against Flickr.
+// Example:  http://localhost:6002/photos/date-posted-desc/all/1
+//
+//******************************************************************************
 app.get('/photos/:sort/:group/:page', function (req, res) {
 
-  Flickr.authenticate(flickrOptions, function(error, flickr) {
-    // we can now use "flickr" as our API object
+  // Check if the user is logged on.  If they are not then it will
+  // initiate the oauth flow.
+  if (!req.cookies.groopy_access_token) {
+    res.end(JSON.stringify({"stat":"fail", "code":"999","message":"Not logged on"}));
+  }
+
+  // Get the hostname of the URL that this app is running on.  As the app
+  // runs all in the same directory then all we need to do is get the host for
+  // all requests to the server.
+  var params = {
+    api_key: flickrOptions.api_key,
+    user_id: req.cookies.groopy_user_id,
+    page: req.params.page,
+    per_page: 25,
+    privacy_filter: 1,
+    sort: req.params.sort,
+    extras: "views, url_q"
+  } ;
+
+  if (req.params.group != "all") {
+    params.group_id = req.params.group;
+  }
 
 
-    // Get the hostname of the URL that this app is running on.  As the app
-    // runs all in the same directory then all we need to do is get the host for
-    // all requests to the server.
-    var host = req.get("host");
-
-    var params = {
-      user_id: flickr.options.user_id,
-      page: req.params.page,
-      per_page: 25,
-      privacy_filter: 1,
-      sort: req.params.sort,
-      extras: "views, url_q"
-    } ;
-
-    if (req.params.group != "all") {
-      params.group_id = req.params.group;
+  flickr.get('?method=flickr.photos.search', {
+    oauth:{token: req.cookies.groopy_access_token, secret: req.cookies.groopy_access_secret},
+    qs:params
+  },function (err, inres, body) {
+    if (err) {
+      res.end(JSON.stringify(err));
+    } else {
+      res.end(JSON.stringify(body));
     }
-
-    flickr.photos.search(params, function(err, result) {
-
-      // Add in some RESTfull next and previous page urls into the response.
-      if (result) {
-        var page = result.photos.page;
-        if (page > 1) {
-          var prevpage = page - 1;
-          result.prev='http://'+host+'/photos/'+ prevpage + '/' + req.params.text;
-        }
-
-        if (page < result.photos.pages) {
-          var nextpage = page + 1;
-          result.next='http://'+host+'/photos/'+ nextpage + '/' + req.params.text;
-        }
-      }
-      res.send(result);
-    });
   });
 });
 
+//******************************************************************************
+//
+// Run a search against Flickr.
+// Example:  http://localhost:6002/photos/date-posted-desc/all/1/watch
+//
+//******************************************************************************
 app.get('/photos/:sort/:group/:page/:text', function (req, res) {
 
-  Flickr.authenticate(flickrOptions, function(error, flickr) {
-    // we can now use "flickr" as our API object
+  // Check if the user is logged on.  If they are not then it will
+  // initiate the oauth flow.
+  if (!req.cookies.groopy_access_token) {
+    res.end(JSON.stringify({"stat":"fail", "code":"999","message":"Not logged on"}));
+  }
+  var params = {
+    api_key: flickrOptions.api_key,
+    user_id: req.cookies.groopy_user_id,
+    page: req.params.page,
+    per_page: 25,
+    privacy_filter: 1,
+    extras: "views, url_q",
+    sort: req.params.sort,
+    text: req.params.text
+  } ;
 
-    // Get the hostname of the URL that this app is running on.  As the app
-    // runs all in the same directory then all we need to do is get the host for
-    // all requests to the server.
-    var host = req.get("host");
+  if (req.params.group != "all") {
+    params.group_id = req.params.group;
+  }
 
-
-    var params = {
-      user_id: flickr.options.user_id,
-      page: req.params.page,
-      per_page: 25,
-      privacy_filter: 1,
-      extras: "views, url_q",
-      sort: req.params.sort,
-      text: req.params.text
-    } ;
-
-    if (req.params.group != "all") {
-      params.group_id = req.params.group;
+  flickr.get('?method=flickr.photos.search', {
+    oauth:{token: req.cookies.groopy_access_token, secret: req.cookies.groopy_access_secret},
+    qs:params
+  },function (err, inres, body) {
+    if (err) {
+      res.end(JSON.stringify(err));
+    } else {
+      res.end(JSON.stringify(body));
     }
-
-
-    flickr.photos.search(params, function(err, result) {
-
-      // Add in some RESTfull next and previous page urls into the response.
-      if (result) {
-        var page = result.photos.page;
-        if (page > 1) {
-          var prevpage = page - 1;
-          result.prev='http://'+host+'/photos/'+ prevpage + '/' + req.params.text;
-        }
-
-        if (page < result.photos.pages) {
-          var nextpage = page + 1;
-          result.next='http://'+host+'/photos/'+ nextpage + '/' + req.params.text;
-        }
-      }
-
-
-      res.send(result);
-    });
   });
 });
 
 
+//******************************************************************************
+//
+// Get the list of groups.
+// Example:  http://localhost:6002/photo/22237689693
+//
+// Returns "stat":"ok" if it worked.
+// Returned "stat":"fail" if something went wrong.
+//
+//******************************************************************************
 app.get('/photo/:photo_id', function (req, res) {
 
-  Flickr.authenticate(flickrOptions, function(error, flickr) {
-    // we can now use "flickr" as our API object
+  // Check if the user is logged on.  If they are not then it will
+  // initiate the oauth flow.
+  if (!req.cookies.groopy_access_token) {
+    res.end(JSON.stringify({"stat":"fail", "code":"999","message":"Not logged on"}));
+  }
 
-    // TODO need to store the access_token, access_token_secret and user_id to the session cookie instead of the .env file.
+  var params = {
+    api_key: flickrOptions.api_key,
+    photo_id: req.params.photo_id
+  } ;
 
-
-    flickr.photos.getAllContexts({
-      photo_id: req.params.photo_id
-    }, function(err, result) {
-      // result is Flickr's response
-      if (!err)
-      {
-        result.id = req.params.photo_id;
-        res.send(result);
-      } else {
-        console.log(req.params.photo_id, err);
-      }
-
-    });
+  flickr.get('?method=flickr.photos.getAllContexts', {
+    oauth:{token: req.cookies.groopy_access_token, secret: req.cookies.groopy_access_secret},
+    qs:params
+  },function (err, inres, body) {
+    if (err) {
+      res.end(JSON.stringify(err));
+    } else {
+      body.id = req.params.photo_id;
+      var response = JSON.stringify(body);
+      res.end(JSON.stringify(body));
+    }
   });
 });
 
 
-
+//******************************************************************************
+//
+// Move the photo between groups
+//
+//******************************************************************************
 app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
 
-  Flickr.authenticate(flickrOptions, function(error, flickr) {
-    // we can now use "flickr" as our API object
+  // Check if the user is logged on.  If they are not then it will
+  // initiate the oauth flow.
+  if (!req.cookies.groopy_access_token) {
+    res.end(JSON.stringify({"stat":"fail", "code":"999","message":"Not logged on"}));
+  }
 
-    // TODO need to store the access_token, access_token_secret and user_id to the session cookie instead of the .env file.
-
-    // TODO this is just a placeholder to test the client code. Need to add the pool movement code.
-//    console.log("Requested move of photo "+req.params.photo_id+" from pool " + req.params.from_pool + " to pool " + req.params.to_pool);
-    var result = {};
-    result.id = req.params.photo_id;
-    result.from_pool = req.params.from_pool;
-    result.to_pool = req.params.to_pool;
+  var result = {};
+  result.id = req.params.photo_id;
+  result.from_pool = req.params.from_pool;
+  result.to_pool = req.params.to_pool;
 
 //    console.log("***ACTUAL UPDATE COMMENTED OUT FOR TEST***");
 
+  var params = {
+    api_key: flickrOptions.api_key,
+    photo_id: req.params.photo_id,
+    group_id: req.params.to_pool
+  } ;
 
-    flickr.groups.pools.add({
-      photo_id: req.params.photo_id,
-      group_id: req.params.to_pool
-    }, function (err, result) {
-      if (!err) {
 
-        //
-        // If there is a from pool (because if the photo was in no
-        // pool then this would be null
-        //
-        if (req.params.from_pool) {
+  flickr.get('?method=flickr.groups.pools.add', {
+    oauth:{token: req.cookies.groopy_access_token, secret: req.cookies.groopy_access_secret},
+    qs:params
+  },function (err, inres, body)
+  {
+    if (err) {
+      res.end(JSON.stringify(err));
+    } else {
 
-          //
-          flickr.groups.pools.remove ({
-            photo_id: req.params.photo_id,
-            group_id: req.params.from_pool
-            }, function (err, result) {
-              if (!err){
-                result.error = "no error";
-              } else {
-  //              console.log(err);
-  //              result.error = err;
-              }
-            });
+      if (req.params.from_pool) {
+        var params = {
+          api_key: flickrOptions.api_key,
+          photo_id: req.params.photo_id,
+          group_id: req.params.from_pool
+        } ;
+
+        flickr.get('?method=flickr.groups.pools.remove', {
+          oauth:{token: req.cookies.groopy_access_token, secret: req.cookies.groopy_access_secret},
+          qs:params
+        },function (err, inres, body) {
+          if (err) {
+            res.end(JSON.stringify(err));
+          } else {
+            body.id=req.params.photo_id;
+            res.end(JSON.stringify(body));
           }
-
+        });
       } else {
-        console.log(err);
-        result.error = err;
+        body.id=req.params.photo_id;
+        res.end(JSON.stringify(body));
       }
-    });
-
-    res.send(result);
-
+  }
   });
-});
-
-
-
-
-//  The authentication handler.
-app.get('/auth', function (req, res) {
-
-  res.write("Authenticated");
-  flickrOptions.exchange(req.query);
-  console.log('Authenticated');
-
-
 
 });
 

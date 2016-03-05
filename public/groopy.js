@@ -1,6 +1,6 @@
   angular.module('groopyApp', ['ngAnimate'])
 
-  .controller('GroopyController', function($scope, $location, $http, $q){
+  .controller('GroopyController', function($scope, $location, $http, $q, $window){
 
     // Used to cancel HTTP requests when the page changes.
     $scope.httpAborter = $q.defer();
@@ -20,6 +20,7 @@
     $scope.currGroup = [];
     $scope.nextGroup = [];
     $scope.views = [];
+    $scope.imageLink = [];
 
     // Maps the Flickr pool ID to the name.
     const GROUPLIST = [
@@ -52,7 +53,6 @@
       groupLookup[GROUPLIST[i].id] = GROUPLIST[i];
       groupLookup[GROUPLIST[i].id].index = i;
     }
-    console.log (groupLookup);
 
     // Maps the Flickr API sort strings to text.
     $scope.sortItems = [
@@ -107,7 +107,6 @@
 
       // Reset the page number to 1 if anything other than the page number changed.
       // Page number is index number 1 in the array.
-      console.log (doFetch, newValues[1], oldValues[1]);
       if (doFetch && (newValues[1] == oldValues[1])){
         $scope.page = 1;
       }
@@ -168,7 +167,14 @@
 
 
       // Make the request to search for the photos.
+      var start = new Date().getTime();
       $http.get(url, {timeout: $scope.httpAborter.promise}).then(function(response){
+
+        console.log("Get:", url, response.data, 'Time: ' + (new Date().getTime() - start));
+        if (response.data.stat == "fail" && response.data.code == "999") {
+          // Need to log on the user
+          $window.location.href = GetBaseURL() + "/connect/flickr";
+        }
 
         // Sets up the grid with the result JSON data
         $scope.details = response.data;
@@ -181,16 +187,31 @@
 
           // Make the call to get the pools the photo is in.
           // Which looks like: http://localhost:8080/photo/id
-          console.log ("Requesting photo pool details for ID " + photo.id);
+//          console.log ("Requesting photo pool details for ID " + photo.id);
           if (!photo.id) {
             console.log ("**No photo ID**", response.data, key, photo);
           } else {
+
+            // Set the link to the photo for the ui.
+            $scope.imageLink[photo.id] = "https://www.flickr.com/photos/" + photo.owner + "/" + photo.id;
+
             //
             // TODO need to tidy this up.  For some reason there is a rogue object in
             // the array that causes an error.  I am simply not making the Server
             // call when there is no photo.id
             //
+            var start = new Date().getTime();
             $http.get(GetBaseURL() + "/photo/"+photo.id, {timeout: $scope.httpAborter.promise}).then(function(response){
+
+              // Check logged in
+              console.log("Get:", url, response.data, 'Time: ' + (new Date().getTime() - start));
+              if (response.data.stat == "fail" && response.data.code == "999") {
+                // Need to log on the user
+                $window.location.href = GetBaseURL() + "/connect/flickr";
+              }
+
+
+
               // This is where the magic happens...
               var id = response.data.id;
               var views = $scope.views[id];
@@ -218,7 +239,7 @@
                   // Find out what group the photo should be in
                   var shouldBeInGroup = null ;
                   for (i=GROUPLIST.length - 1; !shouldBeInGroup; i-- ) {
-                    if (Number(views)>Number(GROUPLIST[i].name)) {
+                    if (Number(views)>=Number(GROUPLIST[i].name)) {
                       shouldBeInGroup = GROUPLIST[i];
                     }
                   }
@@ -234,11 +255,11 @@
               }
               // Now need to check if the photo is in NO group but should be.
               if (!inGroup) {
-                if (Number(views) > 25) {
+                if (Number(views) >= 25) {
                   $scope.displayBox[id] = true;
 
                   for (i=GROUPLIST.length - 1; !shouldBeInGroup; i-- ) {
-                    if (Number(views) > Number(GROUPLIST[i].name)){
+                    if (Number(views) >= Number(GROUPLIST[i].name)){
                       $scope.nextGroup[id] = GROUPLIST[i].name;
                       break;
                     }
@@ -277,14 +298,23 @@
 
         var from_pool_id = GROUPLIST.getKeyByValue($scope.currGroup[id]);
         var to_pool_id = GROUPLIST.getKeyByValue($scope.nextGroup[id]);
-        console.log(id, from_pool_id, to_pool_id);
 
-        $http.get(GetBaseURL() + "/move/"+id+"/"+from_pool_id+"/"+to_pool_id).then(function(response){
+        var url = GetBaseURL() + "/move/"+id+"/"+from_pool_id+"/"+to_pool_id;
+        var start = new Date().getTime();
+        $http.get(url).then(function(response){
+
+          // Check logged in
+          console.log("Get:", url, response.data, 'Time: ' + (new Date().getTime() - start));
+          if (response.data.stat == "fail" && response.data.code == "999") {
+            // Need to log on the user
+            $window.location.href = GetBaseURL() + "/connect/flickr";
+          }
+
+
           //
           // TODO need to add in an error handler because it is possible that the user
           // is not a member of a group.
           //
-          console.log(response.data);
           $scope.displayBox[response.data.id] = false;
           $scope.displayWait[response.data.id] = false;
         });

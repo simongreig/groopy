@@ -16,6 +16,9 @@
       <div class="trtxt" ng-show="isShowBox(value.id)">{{nextGroup[value.id]}}</div>
 
       <div class="bltxt">{{value.views}}</div>
+      <a class="photolink" href="{{imageLink[value.id]}}" target="_blank">
+        <div class="brtxt">&gt;</div>
+      </a>
 
 
       <div class="waiting" ng-show="isShowWait(value.id)"> <div class="inner"><img src="spinner.gif" width="20px" height="20px"></div> </div>
