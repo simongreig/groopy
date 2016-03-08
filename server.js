@@ -3,7 +3,7 @@
 console.log ("Running in NODE_ENV=" + process.env.NODE_ENV);
 
 const express = require('express');
-var session = require('express-session');
+var cookieSession = require('cookie-session');
 var Grant = require('grant-express');
 var cookieParser = require('cookie-parser');
 var Purest = require('purest');
@@ -84,7 +84,13 @@ const app = express();
 app.use(express.static(__dirname + '/public'));
 
 
-app.use(session({secret: flickrOptions.session_secret}));
+app.use(cookieSession({
+  name: 'groopy-session-default',
+  keys: [flickrOptions.session_secret1, flickrOptions.session_secret2]
+}))
+
+
+
 app.use(grant);
 app.use(cookieParser());
 

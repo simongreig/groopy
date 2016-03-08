@@ -11,6 +11,7 @@
     "cfenv": "^1.0.3",
     "compression": "^1.6.1",
     "cookie-parser": "^1.4.1",
+    "cookie-session": "^2.0.0-alpha.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "grant-express": "^3.5.5",

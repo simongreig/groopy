@@ -7,7 +7,7 @@
 
   <div ng-repeat="(key, value) in details.photos.photo">
 
-    <div uib-tooltip-html="tooltip[value.id]" tooltip-popup-delay='1000' tooltip-class="groopy-tooltip" tooltip-placement="bottom" class="bgimg" style="background:url({{value.url_q}})">
+    <div uib-tooltip-html="tooltip[value.id]" tooltip-popup-delay='2000' tooltip-class="groopy-tooltip" tooltip-placement="bottom" class="bgimg" style="background:url({{value.url_q}})">
 
 
       <div id="{{value.id}}" ng-click="clickBox(value.id)" ng-show="isShowBox(value.id)" ng-class="getBoxClass(value.id)"> </div>

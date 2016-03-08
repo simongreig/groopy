@@ -16,6 +16,11 @@ body {
   z-index: 999;
 }
 
+.groopy-menu-icon {
+  width:30px;
+  text-align: center;
+}
+
 .search-bar {
   top: 0px;
   color: white;
@@ -27,6 +32,9 @@ body {
 .groopy-nav {
   display:inline;
   position: relative;
+}
+
+.groopy-nav-item {
   padding-left: 20px;
 }
 
@@ -72,7 +80,7 @@ body {
 .search-input {
   position:relative;
   margin: 0;
-  width: 185px;
+  width: 200px;
   height:32px;
   font-size: 16px;
   appearance: none;
@@ -109,7 +117,7 @@ body {
   appearance: none;
   box-shadow: none;
   border-radius: none;
-  cursor:default;
+  cursor:pointer;
 }
 
 .group-dropdown {
@@ -122,7 +130,26 @@ body {
   appearance: none;
   box-shadow: none;
   border-radius: none;
-  cursor:default;
+  cursor:pointer;
+}
+
+.groopy-btn-group {
+  display: inline-block;
+  position: relative;
+  height:50px;
+}
+
+.groopy-admin-dropdown {
+  display: block;
+  position: relative;
+  margin: 0;
+  width: 170px;
+  height: 20px;
+  font-size: 16px;
+  appearance: none;
+  box-shadow: none;
+  border-radius: none;
+  cursor:pointer;
 }
 
 
@@ -354,16 +381,51 @@ a.goodbyeLink:link {
   height:74px;
 }
 
-.footer {
+
+.about_content {
+  width: 752px;
+  height: 752px;
+  background-color: white;
+  opacity: 0.9;
   text-align: center;
-  padding-top: 10px;
-  font-size: 8px;
+  position: fixed;
+  top:74px;
+  padding: 50px;
+  font-size: 20pt;
+  -webkit-transition: opacity linear 0.25s;
+  transition: opacity linear 0.25s;
 }
 
-.footer a {
-  color: #404040;
+.about_content.ng-hide {
+  opacity:0;
 }
 
-.footer a:visited {
-    color: #404040;
+.help_content {
+  width: 752px;
+  height: 752px;
+  background-color: white;
+  opacity: 0.9;
+  text-align: center;
+  position: fixed;
+  top:74px;
+  padding: 50px;
+  font-size: 18pt;
+  -webkit-transition: opacity linear 0.25s;
+  transition: opacity linear 0.25s;
+}
+
+.help_content.ng-hide {
+  opacity:0;
+}
+
+.groopy-close-button {
+  cursor: pointer;
+  position: absolute;
+  font-size: 30pt;
+  top: 0;
+  left: 10px;
+}
+
+.help-image-container {
+  display:block;
 }

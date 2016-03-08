@@ -14,6 +14,8 @@
     // added because the new watch logic to minimise accidental fetches is too
     // restrictive.
     $scope.firstLoad = true;
+    $scope.showAbout = false;
+    $scope.showHelp  = false;
 
     // The photo search screen elements.
     $scope.search = "";
@@ -424,6 +426,29 @@
           return "goodbyegroup";
         }
       };
+
+
+      //******************************************************************************
+      //
+      // Toggle the about page.
+      //
+      //******************************************************************************
+      $scope.toggleAbout = function () {
+        $scope.showHelp = false;
+        $scope.showAbout = !$scope.showAbout;
+      };
+
+
+      //******************************************************************************
+      //
+      // Toggle the help page.
+      //
+      //******************************************************************************
+      $scope.toggleHelp = function () {
+        $scope.showAbout = false;
+        $scope.showHelp = !$scope.showHelp;
+      };
+
 
       //******************************************************************************
       //

@@ -2,9 +2,9 @@
 <html ng-app="groopyApp" ng-controller="GroopyController">
 
   <head>
-    <title>Flickr Groopy v2</title>
+    <title>Flickr Groopy</title>
 
-
+    <link rel="icon" type="image/png" href="favicon.png">
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.js"></script>
     <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.3.js"></script>
@@ -32,9 +32,37 @@
     <div class="content">
       <div class="search-bar">
 
-        <div class="groopy-nav logo"><img src="groopy.png"></div>
-
+        <!-- The cog ADMIN dropdown -->
         <div class="groopy-nav">
+          <div class="groopy-btn-group" uib-dropdown>
+            <div id="admin-button" class="groopy-admin-dropdown" uid-dropdown-toggle>
+              <div uib-dropdown-toggle>
+                <div class="groopy-nav logo"><img src="groopy.png"></div>
+              </div>
+            </div>
+            <ul uib-dropdown-menu role="menu" aria-labelledby="admin-button">
+              <li role="menuitem">
+                <a href="" ng-click="toggleAbout()"><i class="groopy-menu-icon fa fa-info-circle"></i>About</a>
+              </li>
+              <li role="menuitem">
+                <a href="" ng-click="toggleHelp()"><i class="groopy-menu-icon fa fa-life-ring"></i>Help</a>
+              </li>
+<!--              <li role="menuitem">
+                <a href="/logout"><i class="groopy-menu-icon fa fa-sign-out"></i>Logout</a>
+              </li>  -->
+              <li class="divider"></li>
+              <li role="menuitem">
+                <a href="https://www.flickr.com/photos/xrrr" target="_blank"><i class="groopy-menu-icon fa fa-user"></i>Built by Simon Greig</a>
+              </li>
+              <li role="menuitem">
+                <a target="_blank" href="http://bluemix.net"><i class="groopy-menu-icon fa fa-cloud"></i>Powered by IBM Bluemix</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+
+        <div class="groopy-nav groopy-nav-item">
           <div class="btn-group" uib-dropdown>
             <div id="sort-button" class="sort-dropdown" uid-dropdown-toggle>
               <div uib-dropdown-toggle>
@@ -47,12 +75,9 @@
               </li>
             </ul>
           </div>
-
-
-
         </div>
 
-        <div class="groopy-nav">
+        <div class="groopy-nav groopy-nav-item">
           <div class="btn-group" uib-dropdown>
             <div id="group-button" class="group-dropdown" uid-dropdown-toggle>
               <div uib-dropdown-toggle>
@@ -65,12 +90,10 @@
               </li>
             </ul>
           </div>
-
-
         </div>
 
 
-        <div class="groopy-nav">
+        <div class="groopy-nav groopy-nav-item">
           <div class="groopy-search-box">
             <input type="text"
                  class="search-input"
@@ -83,15 +106,22 @@
 
 
 
+
+
       </div> <!-- Search bar -->
-
-
-
 
 
       <div class="grid-info"
            ng-include="'grid.html'">
       </div>
+
+      <div class="about-info"
+           ng-include="'about.html'">
+      </div>
+      <div class="help-info"
+           ng-include="'help.html'">
+      </div>
+
 
       <div class="page-container">
         <div class="pages" ng-show="details">
@@ -100,12 +130,6 @@
       </div>
 
       <div class="groopy-error-text">{{error_string}}</div>
-    </div>
-    <div class="footer">
-      
-      <a href="https://www.flickr.com/photos/xrrr" target="_blank">Built by Simon Greig</a>
-      <br/>
-      <a target="_blank" href="http://bluemix.net">Powered by IBM Bluemix</a>
     </div>
 
   </body>
