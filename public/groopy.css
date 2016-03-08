@@ -17,7 +17,7 @@ body {
 }
 
 .search-bar {
-  top: -5px;
+  top: 0px;
   color: white;
   position: fixed;
   white-space: nowrap;
@@ -70,39 +70,32 @@ body {
 }
 
 .search-input {
-/*  display: block;
-  position: relative;
-  top:4px;  */
   position:relative;
   margin: 0;
-  width: 181px;
+  width: 185px;
   height:32px;
   font-size: 16px;
   appearance: none;
   box-shadow: none;
-  border-radius: none;
+  border-radius: 0;
   color:black;
   background-color: #f3f5f6;
   border: 0;
   outline:0;
   padding-left:10px;
+  margin-right: -4px;
 }
 
 .groopy-search-icon {
-/*  position: relative;
-  top: 14px;
-  padding-left: 0px;
-  left: -4px;  */
-  background-image: url('magnifying-glass.svg');
-  background-size: 15px;
-  background-repeat: no-repeat;
-  background-position: center;
   background-color: #f3f5f6;
-  height:32px;
-  width: 25px;
-  display: inline-block;
-  top: 10px;
-  left:-4px;
+  padding-left: 4px;
+  padding-top: 8px;
+  padding-right: 4px;
+  padding-bottom: 7px;
+}
+
+.fa-search {
+  color:#404040;
 }
 
 
@@ -171,11 +164,11 @@ div.bltxt {
 }
 
 a.photolink:visited {
-    color: #ffb03b;
+    color: #fff0a5;
 }
 
 a.photolink:link {
-    color: #ffb03b;
+    color: #fff0a5;
 }
 
 div.brtxt {
@@ -186,6 +179,8 @@ div.brtxt {
   width:20px;
   height:20px;
   left:130px;
+  font-size: 10px;
+  padding-top: 3px;
 }
 
 div.tltxt {
@@ -211,20 +206,34 @@ div.trtxt {
 
 .goodbyeLink {
   padding-right: 3px;
-  top: -9px;
   position: relative;
-  font-size: 30pt;
+  font-size: 10pt;
 }
 
 a.goodbyeLink:visited {
-    color: #ffb03b;
+    color: #fff0a5;
     text-decoration: none;
 }
 
 a.goodbyeLink:link {
-    color: #ffb03b;
+    color: #fff0a5;
     text-decoration: none;
 }
+
+.tooltip.groopy-tooltip .tooltip-inner {
+  background-color: #f0f0f0;
+  color: #404040;
+  font-size: 12pt;
+}
+
+.tooltip.groopy-tooltip .tooltip-arrow {
+  border-bottom-color: #f0f0f0;
+}
+
+.groopy-tooltip-detail {
+  font-size:8pt;
+}
+
 
 .waiting {
   width:150px;
@@ -327,7 +336,7 @@ a.goodbyeLink:link {
 
 .groopy-error-text {
   color:red;
-  font-size: 25;
+  font-size: 25pt;
   text-align: center;
 }
 
@@ -339,4 +348,22 @@ a.goodbyeLink:link {
 
 .pagination>li>a, .pagination>li>span {
   color: #404040;
+}
+
+.page-container {
+  height:74px;
+}
+
+.footer {
+  text-align: center;
+  padding-top: 10px;
+  font-size: 8px;
+}
+
+.footer a {
+  color: #404040;
+}
+
+.footer a:visited {
+    color: #404040;
 }

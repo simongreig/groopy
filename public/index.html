@@ -10,6 +10,7 @@
     <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.3.js"></script>
     <script src="groopy.js"></script>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="font-awesome-4.5.0/css/font-awesome.min.css">
 
     <!-- This groopy.css needs to stay last in the list as it overrides some of the bootstrap UI stuff -->
     <link rel="stylesheet" href="groopy.css">
@@ -71,16 +72,14 @@
 
         <div class="groopy-nav">
           <div class="groopy-search-box">
-          <input type="text"
-               class="search-input"
-               ng-model="search"
-               ng-model-options="{ debounce: 800 }"
-               placeholder="Keywords or tags..." />
-  <!--      </div>    -->
-
-        <div class="groopy-nav groopy-search-icon" > </div>
-</div>
-</div>
+            <input type="text"
+                 class="search-input"
+                 ng-model="search"
+                 ng-model-options="{ debounce: 800 }"
+                 placeholder="Keywords or tags..." />
+            <div class="groopy-nav groopy-search-icon" ><i class="fa fa-search"></i></div>
+          </div>
+        </div>
 
 
 
@@ -94,12 +93,19 @@
            ng-include="'grid.html'">
       </div>
 
-
-      <div class="pages" ng-show="details">
-        <uib-pagination total-items="totalPages"  ng-change="pageChanged()" ng-model="page" max-size="maxSize" class="pagination" boundary-link-numbers="true" next-text="&gt;" previous-text="&lt;"></uib-pagination>
+      <div class="page-container">
+        <div class="pages" ng-show="details">
+          <uib-pagination total-items="totalPages"  ng-change="pageChanged()" ng-model="page" max-size="maxSize" class="pagination" boundary-link-numbers="true" next-text="&gt;" previous-text="&lt;"></uib-pagination>
+        </div>
       </div>
 
       <div class="groopy-error-text">{{error_string}}</div>
+    </div>
+    <div class="footer">
+      
+      <a href="https://www.flickr.com/photos/xrrr" target="_blank">Built by Simon Greig</a>
+      <br/>
+      <a target="_blank" href="http://bluemix.net">Powered by IBM Bluemix</a>
     </div>
 
   </body>

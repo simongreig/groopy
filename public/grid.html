@@ -7,18 +7,19 @@
 
   <div ng-repeat="(key, value) in details.photos.photo">
 
-    <div class="bgimg" style="background:url({{value.url_q}})">
+    <div uib-tooltip-html="tooltip[value.id]" tooltip-popup-delay='1000' tooltip-class="groopy-tooltip" tooltip-placement="bottom" class="bgimg" style="background:url({{value.url_q}})">
 
 
       <div id="{{value.id}}" ng-click="clickBox(value.id)" ng-show="isShowBox(value.id)" ng-class="getBoxClass(value.id)"> </div>
 
       <div class="tltxt" ng-show="isShowBox(value.id)">{{currGroup[value.id]}}</div>
       <div class="trtxt" ng-if = "!goodbyeLink[value.id]" ng-show="isShowBox(value.id)">{{nextGroup[value.id]}}</div>
-      <div class="trtxt" ng-if = "goodbyeLink[value.id]" ng-show="isShowBox(value.id)"><a class="goodbyeLink" target="_blank" href="{{goodbyeLink[value.id]}}">*</a></div>
+      <div class="trtxt" ng-if = "goodbyeLink[value.id]" ng-show="isShowBox(value.id)"><a class="goodbyeLink" target="_blank" href="{{goodbyeLink[value.id]}}"><i class="fa fa-star"></i></a></div>
 
       <div class="bltxt">{{value.views}}</div>
       <a class="photolink" href="{{imageLink[value.id]}}" target="_blank">
-        <div class="brtxt">&gt;</div>
+  <!--      <div class="brtxt">&gt;</div>  -->
+  <div class="brtxt"><i class="fa fa-external-link"></i></div>
       </a>
 
 

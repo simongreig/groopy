@@ -1,5 +1,5 @@
   angular.module('groopyApp', ['ngAnimate', 'ui.bootstrap']);
-  angular.module('groopyApp').controller('GroopyController', function($scope, $location, $http, $q, $window){
+  angular.module('groopyApp').controller('GroopyController', function($scope, $location, $http, $q, $window, $sce){
 
     //
     // Find out if the host is localhost and disable Google Analytics if it is
@@ -31,6 +31,7 @@
     $scope.boxType = [];
     $scope.views = [];
     $scope.imageLink = [];
+    $scope.tooltip = [];
 
     // Maps the Flickr pool ID to the name.
     const GROUPLIST = [
@@ -214,6 +215,7 @@
       $scope.boxType = [];
       $scope.goodbyeLink = [];
       $scope.error_string = "";
+      $scope.tooltip = [];
 
       // Add the wait box
       for (box in $scope.displayWait){
@@ -279,16 +281,18 @@
 
         // for each photo in the result, find the group details.
         for (var key in response.data.photos.photo) {
-          var photo = response.data.photos.photo[key] ;
-          $scope.views[photo.id] = photo.views;
-          $scope.displayWait[photo.id]=true;
-
           // Make the call to get the pools the photo is in.
           // Which looks like: http://localhost:8080/photo/id
 //          console.log ("Requesting photo pool details for ID " + photo.id);
+          var photo = response.data.photos.photo[key] ;
           if (!photo.id) {
             console.log ("**No photo ID**", response.data, key, photo);
           } else {
+
+            $scope.views[photo.id] = photo.views;
+            $scope.displayWait[photo.id]=true;
+            $scope.tooltip[photo.id]=$sce.trustAsHtml(photo.title);
+
 
             // Set the link to the photo for the ui.
             $scope.imageLink[photo.id] = "https://www.flickr.com/photos/" + photo.owner + "/" + photo.id;
@@ -347,6 +351,8 @@
                     move = true;
                     $scope.nextGroup[id] = shouldBeInGroup.name;
                     $scope.boxType[id] = "move";
+                    var tooltip = $scope.tooltip[id] + "<div class='groopy-tooltip-detail'>Click to move to Views: " + shouldBeInGroup.name + "</div>";
+                    $scope.tooltip[id]=$sce.trustAsHtml(tooltip);
                     break ; // Jump out of the loop
                   }
 
@@ -355,6 +361,8 @@
                   if (Number(views)+5 >= Number(next_group)) {
                     $scope.boxType[id] = "cheerio";
                     $scope.goodbyeLink[id] = "https://www.flickr.com/groups/views"+currentGroup.name+"/discuss";
+                    var tooltip = $scope.tooltip[id] + "<div class='groopy-tooltip-detail'>Ready to say goodbye to Views: " + currentGroup.name + "</div>";
+                    $scope.tooltip[id]=$sce.trustAsHtml(tooltip);
                   }
                 }
               }
@@ -366,6 +374,8 @@
                     if (Number(views) >= Number(GROUPLIST[i].name)){
                       $scope.nextGroup[id] = GROUPLIST[i].name;
                       $scope.boxType[id] = "add";
+                      var tooltip = $scope.tooltip[id] + "<div class='groopy-tooltip-detail'>Click to add to Views: " + GROUPLIST[i].name + "</div>";
+                      $scope.tooltip[id]=$sce.trustAsHtml(tooltip);
                       break;
                     }
                   }
