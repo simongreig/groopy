@@ -9,103 +9,130 @@ body {
   color:white;
   height:50px;
   width:100%;
-  position: absolute;
+  position: fixed;
   top:0;
   left:0;
   overflow: hidden;
+  z-index: 999;
 }
 
 .search-bar {
-  top:0;
-  color:white;
-  position: absolute;
-  overflow: hidden;
+  top: -5px;
+  color: white;
+  position: fixed;
+  white-space: nowrap;
+  z-index: 999;
+}
+
+.groopy-nav {
+  display:inline;
+  position: relative;
+  padding-left: 20px;
+}
+
+.grid-info {
+  width: 750px;
+  height: 750px;
+  background-color: #f3f5f6;
+  text-align: center;
 }
 
 .splash {
   font-size: 50px;
   width: 750px;
   height: 750px;
-  background-color: #f0f0f0;
+  background-color: #f3f5f6;
   text-align: center;
   cursor: wait;
 }
 
 .splash-inner {
   position: absolute;
-  padding-top: 300px;
+  padding-top: 350px;
   width:750px;
   height:750px;
-}
-
-li {
-  float:left;
-  padding-left: 20px;
-}
-
-.nav {
-  padding-top: 10px;
 }
 
 .logo {
   padding-left: 0px;
 }
 
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  top:0;
+.logo img {
+  height: 50px;
+  width: 183px;
+}
+
+
+.groopy-search-box {
+  display:inline;
+  position:relative;
+  top:3px;
 }
 
 .search-input {
-  display: block;
+/*  display: block;
   position: relative;
+  top:4px;  */
+  position:relative;
   margin: 0;
-  width: 200px;
-  height:20px;
-  font-size: 14px;
+  width: 181px;
+  height:32px;
+  font-size: 16px;
   appearance: none;
   box-shadow: none;
   border-radius: none;
+  color:black;
+  background-color: #f3f5f6;
+  border: 0;
+  outline:0;
+  padding-left:10px;
 }
 
-.sort-input {
+.groopy-search-icon {
+/*  position: relative;
+  top: 14px;
+  padding-left: 0px;
+  left: -4px;  */
+  background-image: url('magnifying-glass.svg');
+  background-size: 15px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #f3f5f6;
+  height:32px;
+  width: 25px;
+  display: inline-block;
+  top: 10px;
+  left:-4px;
+}
+
+
+.sort-dropdown {
   display: block;
   position: relative;
   margin: 0;
-  width: 150px;
+  width: 170px;
   height: 20px;
-  font-size: 14px;
+  font-size: 16px;
   appearance: none;
   box-shadow: none;
   border-radius: none;
+  cursor:default;
 }
 
-.group-input {
+.group-dropdown {
   display: block;
   position: relative;
   margin: 0;
   width: 120px;
   height: 20px;
-  font-size: 14px;
+  font-size: 16px;
   appearance: none;
   box-shadow: none;
   border-radius: none;
+  cursor:default;
 }
 
-.page-input {
-  position: relative;
-  margin: 0;
-  width: 40px;
-  height: 20px;
-  font-size: 14px;
-  appearance: none;
-  box-shadow: none;
-  border-radius: 0px;
-  text-align: center;
-}
+
 
 
 .content {
@@ -179,6 +206,23 @@ div.trtxt {
   color: #fff0a5;
 }
 
+.goodbyeLink {
+  padding-right: 3px;
+  top: -9px;
+  position: relative;
+  font-size: 30pt;
+}
+
+a.goodbyeLink:visited {
+    color: #ffb03b;
+    text-decoration: none;
+}
+
+a.goodbyeLink:link {
+    color: #ffb03b;
+    text-decoration: none;
+}
+
 .waiting {
   width:150px;
   height:150px;
@@ -209,11 +253,14 @@ div.trtxt {
   border-style: solid;
   position: absolute;
   opacity: 0.8;
-  width: 110px;
-  height: 110px;
+  width: 150px;
+  height: 150px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
   cursor: pointer;
-  -webkit-transition:all linear 1s;
-  transition: all linear 1s;
+  -webkit-transition: opacity linear 1s;
+  transition: opacity linear 1s;
 }
 
 .addgroup.ng-hide {
@@ -226,14 +273,36 @@ div.trtxt {
   border-style: solid;
   position: absolute;
   opacity: 0.8;
-  width: 110px;
-  height: 110px;
+  width: 150px;
+  height: 150px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
   cursor: pointer;
-  -webkit-transition:all linear 1s;
-  transition: all linear 1s;
+  -webkit-transition: opacity linear 1s;
+  transition: opacity linear 1s;
 }
 
 .movegroup.ng-hide {
+  opacity:0;
+}
+
+.goodbyegroup {
+  border-width: 20px;
+  border-color: #80176B;
+  border-style: solid;
+  position: absolute;
+  opacity: 0.8;
+  width: 150px;
+  height: 150px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transition: opacity linear 1s;
+  transition: opacity linear 1s;
+}
+
+.goodbyegroup.ng-hide {
   opacity:0;
 }
 
@@ -251,4 +320,20 @@ div.trtxt {
 .pages.ng-hide {
   opacity:0;
   height: 0px;
+}
+
+.groopy-error-text {
+  color:red;
+  font-size: 25;
+  text-align: center;
+}
+
+.pagination>.active>a {
+  border-color:#404040;
+  background-color: #404040;
+  color: #ffffff;
+}
+
+.pagination>li>a, .pagination>li>span {
+  color: #404040;
 }

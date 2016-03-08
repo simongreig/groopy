@@ -1,0 +1,126 @@
+<!doctype html>
+<html ng-app="ui.bootstrap.demo">
+  <head>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.js"></script>
+    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.3.js"></script>
+    <script src="example.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+.nav-wrapper {
+
+}
+
+.nav-item {
+display:inline-block;
+width:80px;
+padding-left: 20px;
+min-width: 80px;
+}
+
+.clearfloat {
+  float:none;
+}
+
+
+</style>
+  </head>
+  <body ng-controller="DropdownCtrl">
+
+
+    <div class="nav-wrapper">
+      <div class="nav-item"><a href="#home">Home</a></div>
+      <div class="nav-item"><a href="#news">News</a></div>
+      <div class="nav-item"><a href="#contact">Contact</a></div>
+      <div class="nav-item"><a href="#about">About</a></div>
+
+
+
+<div class="nav-item">
+
+
+    <!-- Single button -->
+    <div class="btn-group" uib-dropdown is-open="status.isopen">
+      <button id="single-button" type="button" class="btn btn-primary" uib-dropdown-toggle ng-disabled="disabled">
+        Button dropdown <span class="caret"></span>
+      </button>
+      <ul uib-dropdown-menu role="menu" aria-labelledby="single-button">
+        <li role="menuitem"><a href="#">Action</a></li>
+        <li role="menuitem"><a href="#">Another action</a></li>
+        <li role="menuitem"><a href="#">Something else here</a></li>
+        <li class="divider"></li>
+        <li role="menuitem"><a href="#">Separated link</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+<div class="nav-item">
+  <div class="btn-group" uib-dropdown>
+     <button id="btn-append-to-single-button" type="button" class="btn btn-primary" uib-dropdown-toggle>
+       Inline Dropdown <span class="caret"></span>
+     </button>
+     <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="btn-append-to-single-button">
+       <li role="menuitem"><a href="#">Action</a></li>
+       <li role="menuitem"><a href="#">Another action</a></li>
+       <li role="menuitem"><a href="#">Something else here</a></li>
+       <li class="divider"></li>
+       <li role="menuitem"><a href="#">Separated link</a></li>
+     </ul>
+   </div>
+</div>
+
+
+<div class="nav navitem">
+<!--          <select class="sort-input" ng-model="sort" ng-options="item.label for item in sortItems track by item.api">
+  </select>
+-->
+  <!--  This is the sort button on the menu bar. -->
+  <div class="btn-group" uib-dropdown >
+    <button id="sort-button" type="button" class="btn btn-primary" uib-dropdown-toggle>
+      Blah <span class="caret"></span>
+    </button>
+    <ul uib-dropdown-menu role="menu" aria-labelledby="sort-button">
+      <li role="menuitem"><a href="#">Action</a></li>
+      <li role="menuitem"><a href="#">Another action</a></li>
+      <li role="menuitem"><a href="#">Something else here</a></li>
+      <li class="divider"></li>
+      <li role="menuitem"><a href="#">Separated link</a></li>
+    </ul>
+  </div>
+
+
+
+</div>
+
+<div class="nav navitem">
+<!--          <select class="group-input" ng-model="group" ng-options="item.label for item in poolItems track by item.id">
+  </select>
+-->
+
+  <div class="btn-group" uib-dropdown is-open="status.isopen">
+    <button id="group-button" type="button" class="btn btn-primary" uib-dropdown-toggle>
+      Yadda <span class="caret"></span>
+    </button>
+    <ul uib-dropdown-menu role="menu" aria-labelledby="group-button">
+      <li role="menuitem">
+        <li role="menuitem"><a href="#">Action</a></li>
+        <li role="menuitem"><a href="#">Another action</a></li>
+        <li role="menuitem"><a href="#">Something else here</a></li>
+        <li class="divider"></li>
+        <li role="menuitem"><a href="#">Separated link</a></li>      </li>
+    </ul>
+  </div>
+
+
+</div>
+
+
+  </div>
+
+  And some other text.
+
+
+  </body>
+</html>

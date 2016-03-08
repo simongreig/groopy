@@ -1,11 +1,106 @@
-<html>
-<body>
-Hello Simon
-<ul>
-  <li><a href="/photos">Search</a></li>
-  <li><a href="/photos/25172188885">Photo ID=25172188885</a></li>
-  <li><a href="/details">Details</a></li>
-  <li><a href="/groopy.html">Groopy</a></li>
-</ul>
-</body>
+<!doctype html>
+<html ng-app="groopyApp" ng-controller="GroopyController">
+
+  <head>
+    <title>Flickr Groopy v2</title>
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.js"></script>
+    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.3.js"></script>
+    <script src="groopy.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- This groopy.css needs to stay last in the list as it overrides some of the bootstrap UI stuff -->
+    <link rel="stylesheet" href="groopy.css">
+
+    <script ng-if="useGoogleAnalytics">
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-74776870-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+  </head>
+  <body>
+
+    <div class="banner"> </div>
+
+    <div class="content">
+      <div class="search-bar">
+
+        <div class="groopy-nav logo"><img src="groopy.png"></div>
+
+        <div class="groopy-nav">
+          <div class="btn-group" uib-dropdown>
+            <div id="sort-button" class="sort-dropdown" uid-dropdown-toggle>
+              <div uib-dropdown-toggle>
+                {{sort.label}} <span class="caret"></span>
+              </div>
+            </div>
+            <ul uib-dropdown-menu role="menu" aria-labelledby="sort-button">
+              <li role="menuitem">
+                <a href="#" ng-click="changeSort(sortAction)" ng-repeat="sortAction in sortItems">{{sortAction.label}}</a>
+              </li>
+            </ul>
+          </div>
+
+
+
+        </div>
+
+        <div class="groopy-nav">
+          <div class="btn-group" uib-dropdown>
+            <div id="group-button" class="group-dropdown" uid-dropdown-toggle>
+              <div uib-dropdown-toggle>
+                {{group.label}} <span class="caret"></span>
+              </div>
+            </div>
+            <ul uib-dropdown-menu role="menu" aria-labelledby="group-button">
+              <li role="menuitem">
+                <a href="#" ng-click="changePool(poolAction)" ng-repeat="poolAction in poolItems">{{poolAction.label}}</a>
+              </li>
+            </ul>
+          </div>
+
+
+        </div>
+
+
+        <div class="groopy-nav">
+          <div class="groopy-search-box">
+          <input type="text"
+               class="search-input"
+               ng-model="search"
+               ng-model-options="{ debounce: 800 }"
+               placeholder="Keywords or tags..." />
+  <!--      </div>    -->
+
+        <div class="groopy-nav groopy-search-icon" > </div>
+</div>
+</div>
+
+
+
+      </div> <!-- Search bar -->
+
+
+
+
+
+      <div class="grid-info"
+           ng-include="'grid.html'">
+      </div>
+
+
+      <div class="pages" ng-show="details">
+        <uib-pagination total-items="totalPages"  ng-change="pageChanged()" ng-model="page" max-size="maxSize" class="pagination" boundary-link-numbers="true" next-text="&gt;" previous-text="&lt;"></uib-pagination>
+      </div>
+
+      <div class="groopy-error-text">{{error_string}}</div>
+    </div>
+
+  </body>
 </html>
