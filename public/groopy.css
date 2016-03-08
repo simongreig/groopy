@@ -167,6 +167,7 @@ div.bltxt {
   bottom:0px;
   text-align: left;
   color: #fff0a5;
+  cursor: default;
 }
 
 a.photolink:visited {
@@ -194,6 +195,7 @@ div.tltxt {
   text-align: left;
   text-decoration: none;
   color: #fff0a5;
+  cursor: default;
 }
 
 div.trtxt {
@@ -204,6 +206,7 @@ div.trtxt {
   text-align: right;
   text-decoration: none;
   color: #fff0a5;
+  cursor: default;
 }
 
 .goodbyeLink {
