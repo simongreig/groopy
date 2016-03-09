@@ -449,6 +449,41 @@
         $scope.showHelp = !$scope.showHelp;
       };
 
+      //******************************************************************************
+      //
+      // Add the user to all of the relevant groups.  The user is probably
+      // already a member of most of them so just ignore errors.
+      //
+      //******************************************************************************
+      $scope.addToGroups = function () {
+
+        for (var index = 0; index < GROUPLIST.length; index++) {
+          var group = GROUPLIST[index];
+
+          // TODO need to hide this into a function that has the callback as an argument
+          // The inputs are url and callback.  The function does the logon check, timing, logging
+          // and calls the callback.
+          var url = GetBaseURL() + "/group/" + group.id;
+          var start = new Date().getTime();
+
+          $http.get(url).then(function(response){
+            // Check logged in
+            console.log("Get:", response.data, 'Time: ' + (new Date().getTime() - start));
+            if (response.data.stat == "fail" && response.data.code == "999") {
+              // Need to log on the user
+              $window.location.href = GetBaseURL() + "/connect/flickr";
+            }
+
+            console.log (group.name, response.data);
+
+            // TODO show a progress bar for this bit of work.
+
+          });
+        }
+
+      };
+
+
 
       //******************************************************************************
       //
@@ -488,9 +523,12 @@
             // Show an error alert with the error string
             // Error message is in response.data.message
             // response.data.code will have the error codes, likely ones are:
+            // 2 = Not a member of the group
             // 3 = Photo already in pool
             // 5 = Photo limit reached
-            if (response.data.code == "3") {
+            if (response.data.code == "2") {
+              $scope.error_string = "You are not a member of that group.  Click the groopy logo and select the option to add you to the groups.";
+            } else if (response.data.code == "3") {
               $scope.error_string = "Your photo is already in the pool, please make sure that the photo is only in ONE Views group.";
             } else if (response.data.code == "5") {
               $scope.error_string = "You have reached today's limit for adding photos to this group.  Try again tomorrow.";

@@ -86,7 +86,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.use(cookieSession({
   name: 'groopy-session-default',
-  keys: [flickrOptions.session_secret1, flickrOptions.session_secret2]
+  keys: [flickrOptions.session_secret1, flickrOptions.session_secret1]
 }))
 
 
@@ -338,6 +338,49 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
    });
 
 });
+
+//******************************************************************************
+//
+// Join the logged on user to the specified group.
+// e.g. http://localhost:6002/group/665334@N25
+//
+// Returns "stat":"ok" if it worked.
+// Returned "stat":"fail" if something went wrong.
+//
+//******************************************************************************
+app.get('/group/:group_id', function (req, res) {
+
+  // Check if the user is logged on.  If they are not then it will
+  // initiate the oauth flow.
+  if (!req.cookies.groopy) {
+    res.end(JSON.stringify({"stat":"fail", "code":"999","message":"Not logged on"}));
+    return;
+  } else {
+    // Refresh the cookie expiry.
+    req.cookies.groopy.maxAge = 28 * 24 * 3600000; // 4 weeks
+  }
+
+  var params = {
+    api_key: flickrOptions.api_key,
+    group_id: req.params.group_id
+  } ;
+
+  flickr.get('?method=flickr.groups.join', {
+    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
+    qs:params
+  },function (err, inres, body) {
+    if (err) {
+      res.end(JSON.stringify(err));
+    } else {
+      body.id = req.params.photo_id;
+      var response = JSON.stringify(body);
+      res.end(JSON.stringify(body));
+    }
+  });
+});
+
+
+
 
 
 
