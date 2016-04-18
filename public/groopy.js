@@ -1,5 +1,5 @@
-  angular.module('groopyApp', ['ngAnimate', 'ui.bootstrap']);
-  angular.module('groopyApp').controller('GroopyController', function($scope, $location, $http, $q, $window, $sce){
+  angular.module('groopyApp', ['ngAnimate', 'ui.bootstrap', 'ngCookies']);
+  angular.module('groopyApp').controller('GroopyController', function($scope, $location, $timeout, $http, $q, $window, $sce, $cookies){
 
     //
     // Find out if the host is localhost and disable Google Analytics if it is
@@ -14,11 +14,23 @@
     // added because the new watch logic to minimise accidental fetches is too
     // restrictive.
     $scope.firstLoad = true;
-    $scope.showAbout = false;
-    $scope.showHelp  = false;
+    $scope.showDialog = "none";
+
+    // Query string contains a test search.
+//    $locationProvider.html5Mode(true).hashPrefix('!');
+
+    // TODO this needs to use some sort of URL router to do it properly
+    // need to read into it.  For now, bodge it.
+    var textparam = $location.path();
+    textparam = textparam.replace('/', '');
+    console.log (textparam);
+    if (textparam) {
+      $scope.search = textparam;
+    } else {
+      $scope.search = "";
+    }
 
     // The photo search screen elements.
-    $scope.search = "";
     $scope.page=1;
     $scope.totalPages = 1;
 
@@ -34,6 +46,26 @@
     $scope.views = [];
     $scope.imageLink = [];
     $scope.tooltip = [];
+
+    // Number of images to display per page options.  Teh config screen really ought to be in a separate module
+    $scope.perPageOptions = [
+      "25",
+      "50",
+      "75",
+      "100",
+      "150",
+      "200",
+      "300",
+      "400",
+      "500"
+    ];
+
+    $scope.perPage = $cookies.get('groopy-per_page');
+    if (!$scope.perPage) {
+      $scope.perPage = "25";
+    }
+
+
 
     // Maps the Flickr pool ID to the name.
     const GROUPLIST = [
@@ -61,10 +93,15 @@
       {id:"665334@N25", name:"25000"}
       ];
 
+    // Used only for the group add status screen
+    $scope.groupList = GROUPLIST;
+    $scope.groupStatus = [];
+
     var groupLookup = {};
     for (var i = 0; i < GROUPLIST.length; i++) {
       groupLookup[GROUPLIST[i].id] = GROUPLIST[i];
       groupLookup[GROUPLIST[i].id].index = i;
+      $scope.groupStatus[GROUPLIST[i].id] = "wait";
     }
 
     // Maps the Flickr API sort strings to text.
@@ -90,6 +127,27 @@
     }
     $scope.group = {id:"all", label:"All Photos"} ;
 
+    //******************************************************************************
+    //
+    // Gets a param from the query string.
+    //
+    //******************************************************************************
+    function getUrlParameter(param) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split(/[&||?]/),
+                res;
+
+            for (var i = 0; i < sURLVariables.length; i += 1) {
+                var paramName = sURLVariables[i],
+                    sParameterName = (paramName || '').split('=');
+
+                if (sParameterName[0] === param) {
+                    res = sParameterName[1];
+                }
+            }
+
+            return res;
+    }
 
     //******************************************************************************
     //
@@ -186,6 +244,21 @@
 
     //******************************************************************************
     //
+    // Handles the change in per page dropdown
+    //
+    //******************************************************************************
+    $scope.changePerPage = function(selected){
+      $scope.perPage = selected;
+
+      var expireDate = new Date();
+      expireDate.setDate(expireDate.getDate() + (365*5)); // 5 years
+      // Setting a cookie
+      $cookies.put('groopy-per_page', selected, {'expires': expireDate});
+      fetch();
+    }
+
+    //******************************************************************************
+    //
     // Handles the change in pool filter dropdown
     //
     //******************************************************************************
@@ -210,6 +283,12 @@
     //
     //******************************************************************************
     function fetch() {
+
+      // Change the search string in the url
+      if ($location.path() != "/"+$scope.search) {
+        $location.path ( $scope.search ) ;
+      }
+
 
       // Reset everything
       $scope.nextGroup = [];
@@ -245,6 +324,10 @@
 
       if ($scope.search) {
         querystring.text = $scope.search;
+      }
+
+      if ($scope.perPage) {
+        querystring.per_page = $scope.perPage;
       }
 
       // Build the url.  Looks like:
@@ -427,27 +510,39 @@
         }
       };
 
-
       //******************************************************************************
       //
-      // Toggle the about page.
+      // Toggle the dialog with the name in the arguments
+      // e.g. about, help, groupadd,
       //
       //******************************************************************************
-      $scope.toggleAbout = function () {
-        $scope.showHelp = false;
-        $scope.showAbout = !$scope.showAbout;
+      $scope.toggleDialog = function (dialogName) {
+        if ($scope.showDialog != dialogName) {
+          $scope.showDialog = dialogName;
+        }
+        else {
+          $scope.showDialog = "none";
+        }
       };
 
 
       //******************************************************************************
       //
-      // Toggle the help page.
+      // Returns a little snippet of code to determine the status of the group add
       //
       //******************************************************************************
-      $scope.toggleHelp = function () {
-        $scope.showAbout = false;
-        $scope.showHelp = !$scope.showHelp;
+      $scope.getGroupStatus = function (id) {
+        // convert to a proper class name
+        if ($scope.groupStatus[id]=="wait") {
+          return "Checking..." ;
+        } else if ($scope.groupStatus[id]=="ok"){
+          return "Added ok";
+        } else if ($scope.groupStatus[id]=="fail"){
+          return "Already a member";
+        }
       };
+
+
 
       //******************************************************************************
       //
@@ -456,6 +551,18 @@
       //
       //******************************************************************************
       $scope.addToGroups = function () {
+
+        // Set the size of the response status window dynamically in case the list of groups changes
+        // in the future.
+        //
+        var totalExpected = GROUPLIST.length ;
+        var height = totalExpected * 20;
+
+        // Reset
+        for (var i = 0; i < GROUPLIST.length; i++) {
+          $scope.groupStatus[GROUPLIST[i].id] = "wait";
+        }
+        $scope.showDialog = "groupadd";
 
         for (var index = 0; index < GROUPLIST.length; index++) {
           var group = GROUPLIST[index];
@@ -467,6 +574,7 @@
           var start = new Date().getTime();
 
           $http.get(url).then(function(response){
+
             // Check logged in
             console.log("Get:", response.data, 'Time: ' + (new Date().getTime() - start));
             if (response.data.stat == "fail" && response.data.code == "999") {
@@ -474,10 +582,12 @@
               $window.location.href = GetBaseURL() + "/connect/flickr";
             }
 
-            console.log (group.name, response.data);
-
-            // TODO show a progress bar for this bit of work.
-
+            if (response.data.group_id) {
+              $scope.groupStatus [response.data.group_id] = response.data.stat;
+              console.log (groupLookup[response.data.group_id].name, response.data);
+            } else {
+              console.log ("No group ID in response", response.data);
+            }
           });
         }
 
@@ -536,9 +646,6 @@
               $scope.error_string = response.data.message;
             }
           }
-
-
-
         });
       }
 

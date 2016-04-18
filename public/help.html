@@ -1,4 +1,4 @@
-<div class="help_content" ng-show="showHelp">
+<div class="help_content" ng-show="showDialog=='help'">
 <h1>How to Use Groopy</h1>
 By default the image will not have a border and just shows the number of views on the bottom left and a link to the Flickr page on the bottom right.
 <h2>Add to Group</h2>
@@ -6,9 +6,9 @@ Images elibible for a group but not yet in one will be highlighted in an orange 
 <h2>Move Group</h2>
 Images eligible to move groups will be highlighted in green.  The current group is displayed in the top left and the group to move to in the top right.
 <h2>Ready to say Goodbye</h2>
-PHotos 5 views away from group promotion can be added to a forum post called "Ready to say goodbye".  These images are highlighted in purple and a link to the forum is on the top right.
+Photos 5 views away from group promotion can be added to a forum post called "Ready to say goodbye".  These images are highlighted in purple and a link to the forum is on the top right.
 
-<div ng-click="toggleHelp()" class="groopy-close-button">
+<div ng-click="toggleDialog('help')" class="groopy-close-button">
     <i class="fa fa-times-circle"></i>
 </div>
 </div>

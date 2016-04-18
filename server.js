@@ -135,7 +135,7 @@ app.get('/authcallback', function (req, res) {
   cookie_content = req.query;
   cookie_content.user_id = req.query.raw.user_nsid ;
 
-  var expire_time = 28 * 24 * 3600000;  // 4 weeks
+  var expire_time = 5 * 365 * 24 * 3600000;  // 5 years
   res.cookie('groopy' , cookie_content, {maxAge : expire_time});
 
   res.redirect(flickrOptions.post_auth_redirect);
@@ -374,11 +374,40 @@ app.get('/group/:group_id', function (req, res) {
     } else {
       body.id = req.params.photo_id;
       var response = JSON.stringify(body);
+      body.group_id = req.params.group_id;
       res.end(JSON.stringify(body));
     }
   });
 });
 
+
+//******************************************************************************
+//
+// This is a bit of an anomolous function.  It allows the user to
+// provide a search string.  All it does is call index.html with a parameter
+// which is then picked up.
+// e.g. http://localhost:6002/car
+// Whill search for cars
+//
+// Returns "stat":"ok" if it worked.
+// Returned "stat":"fail" if something went wrong.
+//
+//******************************************************************************
+app.get('/:text', function (req, res) {
+
+  // Check if the user is logged on.  If they are not then it will
+  // initiate the oauth flow.
+  if (!req.cookies.groopy) {
+    res.end(JSON.stringify({"stat":"fail", "code":"999","message":"Not logged on"}));
+    return;
+  } else {
+    // Refresh the cookie expiry.
+    req.cookies.groopy.maxAge = 28 * 24 * 3600000; // 4 weeks
+  }
+
+  res.redirect('/#/' + req.params.text);
+
+});
 
 
 

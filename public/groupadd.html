@@ -1,0 +1,11 @@
+<div class="groupadd_content" ng-show="showDialog=='groupadd'">
+  <h1>Add to Groups</h1>
+
+  <div ng-repeat="(key, value) in groupList">
+    <div class="groupadd-group-name">Views: {{value.name}}</div>
+    <div class="groupadd-group-status">{{getGroupStatus(value.id)}}</div>
+  </div>
+  <div ng-click="toggleDialog('groupadd')" class="groopy-close-button">
+      <i class="fa fa-times-circle"></i>
+  </div>
+</div>

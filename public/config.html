@@ -1,0 +1,31 @@
+<div class="config_content" ng-show="showDialog=='config'">
+<h1>Advanced Settings</h1>
+<h2>
+  Images Per Page:
+  <div class="groopy-nav groopy-nav-item">
+    <div class="btn-group" uib-dropdown>
+      <div id="perpage-button" class="perpage-dropdown" uid-dropdown-toggle>
+        <div uib-dropdown-toggle>
+          {{perPage}} <span class="caret"></span>
+        </div>
+      </div>
+      <ul uib-dropdown-menu role="menu" aria-labelledby="perpage-button">
+        <li role="menuitem">
+          <a href="#" ng-click="changePerPage(perPageAction)" ng-repeat="perPageAction in perPageOptions">{{perPageAction}}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</h2>
+Select the number of images to return per page.  Note that the larger the number
+the slower Groopy will be.  The default is 25.
+<h2>Bookmark Text Search</h2>
+It is possible to create browser bookmarks in order to search for a specific tag or keyword when Groopy loads.
+To do so, create a bookmark with the URL in the format:<br/>
+https://groopy.mybluemix.net/keyword
+
+
+<div ng-click="toggleDialog('config')" class="groopy-close-button">
+    <i class="fa fa-times-circle"></i>
+</div>
+</div>

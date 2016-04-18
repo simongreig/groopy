@@ -7,7 +7,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.js"></script>
-    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.3.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.js"></script>
+        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.3.js"></script>
     <script src="groopy.js"></script>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="font-awesome-4.5.0/css/font-awesome.min.css">
@@ -24,9 +25,10 @@
       ga('send', 'pageview');
     </script>
 
+    <!-- Needed to initilise the $location parameter.  -->
+    <base href="/" />
   </head>
   <body>
-
     <div class="banner"> </div>
 
     <div class="content">
@@ -37,22 +39,25 @@
           <div class="groopy-btn-group" uib-dropdown>
             <div id="admin-button" class="groopy-admin-dropdown" uid-dropdown-toggle>
               <div uib-dropdown-toggle>
-                <div class="groopy-nav logo"><img src="groopy.png"></div>
+                <div class="groopy-nav groopy-logo"><i class="groopy-hamburger fa fa-bars"></i></div>
               </div>
             </div>
-            <ul uib-dropdown-menu role="menu" aria-labelledby="admin-button">
+            <ul uib-dropdown-menu role="menu" aria-labelledby="admin-button" class="groopy-hamburger-dropdown">
               <li role="menuitem">
-                <a href="" ng-click="toggleAbout()"><i class="groopy-menu-icon fa fa-info-circle"></i>About</a>
+                <a href="" ng-click="toggleDialog('about')"><i class="groopy-menu-icon fa fa-info-circle"></i>About</a>
               </li>
               <li role="menuitem">
-                <a href="" ng-click="toggleHelp()"><i class="groopy-menu-icon fa fa-life-ring"></i>Help</a>
+                <a href="" ng-click="toggleDialog('help')"><i class="groopy-menu-icon fa fa-life-ring"></i>Help</a>
               </li>
 <!--              <li role="menuitem">
                 <a href="/logout"><i class="groopy-menu-icon fa fa-sign-out"></i>Logout</a>
               </li>  -->
               <li class="divider"></li>
                 <li role="menuitem">
-                  <a href="" ng-click="addToGroups()"><i class="groopy-menu-icon fa fa-plus"></i>Add me to all the groups</a>
+                  <a href="" ng-click="addToGroups()"><i class="groopy-menu-icon fa fa-plus"></i>Add Me to All Groups</a>
+                </li>
+                <li role="menuitem">
+                  <a href="" ng-click="toggleDialog('config')"><i class="groopy-menu-icon fa fa-cogs"></i>Advanced Settings</a>
                 </li>
               <li class="divider"></li>
               <li role="menuitem">
@@ -63,6 +68,10 @@
               </li>
             </ul>
           </div>
+        </div>
+
+        <div class="groopy-nav groopy-nav-item groopy-logo">
+          <img src="groopy.png">
         </div>
 
 
@@ -114,7 +123,7 @@
 
       </div> <!-- Search bar -->
 
-
+      <!-- TODO this is a bit messy, should have in a repeating list -->
       <div class="grid-info"
            ng-include="'grid.html'">
       </div>
@@ -125,7 +134,12 @@
       <div class="help-info"
            ng-include="'help.html'">
       </div>
-
+      <div class="groupadd-info"
+           ng-include="'groupadd.html'">
+      </div>
+      <div class="config-info"
+           ng-include="'config.html'">
+      </div>
 
       <div class="page-container">
         <div class="pages" ng-show="details">

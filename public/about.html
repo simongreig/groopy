@@ -1,4 +1,4 @@
-<div class="about_content" ng-show="showAbout">
+<div class="about_content" ng-show="showDialog=='about'">
 <h1>About Groopy</h1>
 <p>This application exists because I am a user of the Flickr <a href="https://www.flickr.com/groups/views25/" target="_blank">Views: 25...25000</a> groups.</p>
 <p>The idea of these groups is that as soon as your photos have over a certain number of views they are
@@ -8,7 +8,7 @@ at a time. </p>
 <p>So I created an application in 2008 called Groopy.  <br/>This is the 2016 version <i class="fa fa-smile-o"></i></p>
 <p>If you like the app or want to comment then please send me a <a href="http://www.flickr.com/messages_write.gne?to=32563803@N00" target="_blank">Flickr mail</a>.</p>
 <p>Thanks<br><a href="https://www.flickr.com/photos/xrrr" target="_blank">Simon Greig</a></p>
-<div ng-click="toggleAbout()" class="groopy-close-button">
+<div ng-click="toggleDialog('about')" class="groopy-close-button">
     <i class="fa fa-times-circle"></i>
 </div>
 </div>
