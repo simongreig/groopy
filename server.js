@@ -204,6 +204,7 @@ app.get('/photos', function (req, res) {
     params.text = req.query.text;
   }
 
+  var start = new Date().getTime();
   flickr.get('?method=flickr.photos.search', {
     oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
     qs:params
@@ -211,6 +212,7 @@ app.get('/photos', function (req, res) {
     if (err) {
       res.end(JSON.stringify(err));
     } else {
+      body.flickr_time_taken = new Date().getTime() - start;
       res.end(JSON.stringify(body));
     }
   });
@@ -243,6 +245,8 @@ app.get('/photo/:photo_id', function (req, res) {
     photo_id: req.params.photo_id
   } ;
 
+  var start = new Date().getTime();
+
   flickr.get('?method=flickr.photos.getAllContexts', {
     oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
     qs:params
@@ -251,6 +255,7 @@ app.get('/photo/:photo_id', function (req, res) {
       res.end(JSON.stringify(err));
     } else {
       body.id = req.params.photo_id;
+      body.flickr_time_taken = new Date().getTime() - start;
       var response = JSON.stringify(body);
       res.end(JSON.stringify(body));
     }
@@ -326,8 +331,17 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
             console.log ("Remove error:", JSON.stringify(err));
             res.end(JSON.stringify(err));
           } else {
-            body.id=req.params.photo_id;
-            res.end(JSON.stringify(body));
+            if (!body) {
+              // For some reason Flickr has stopped returning a body
+//              console.log ("Remove error, NO BODY:", JSON.stringify(body));
+              var resultbody = {};
+              resultbody.id = req.params.photo_id;
+              resultbody.stat = "ok";
+              res.end(JSON.stringify(resultbody));
+            } else {
+              body.id = req.params.photo_id;
+              res.end(JSON.stringify(body));
+            }
           }
         });
       } else {

@@ -388,10 +388,11 @@
             // call when there is no photo.id
             //
             var start = new Date().getTime();
-            $http.get(GetBaseURL() + "/photo/"+photo.id, {timeout: $scope.httpAborter.promise}).then(function(response){
+            var photoURL = GetBaseURL() + "/photo/"+photo.id ;
+            $http.get(photoURL, {timeout: $scope.httpAborter.promise}).then(function(response){
 
               // Check logged in
-              console.log("Get:", url, response.data, 'Time: ' + (new Date().getTime() - start));
+              console.log("Get:", photoURL, response.data, 'Time: ' + (new Date().getTime() - start));
               if (response.data.stat == "fail" && response.data.code == "999") {
                 // Need to log on the user
                 $window.location.href = GetBaseURL() + "/connect/flickr";
@@ -443,7 +444,7 @@
 
                   // Check if it is ready to say goodbye.
                   var next_group = GROUPLIST[currentGroup.index + 1].name;
-                  if (Number(views)+5 >= Number(next_group)) {
+                  if (!move && (Number(views)+5 >= Number(next_group))) {
                     $scope.boxType[id] = "cheerio";
                     $scope.goodbyeLink[id] = "https://www.flickr.com/groups/views"+currentGroup.name+"/discuss";
                     var tooltip = $scope.tooltip[id] + "<div class='groopy-tooltip-detail'>Ready to say goodbye to Views: " + currentGroup.name + "</div>";
