@@ -30,7 +30,7 @@ body {
 }
 
 .groopy-nav {
-  display:inline;
+  display:inline-block;
   position: relative;
 }
 
@@ -105,7 +105,39 @@ body {
   padding-top: 8px;
   padding-right: 4px;
   padding-bottom: 7px;
+  height:32px;
+  top:4px;
 }
+
+/* Bloody iPhones and iPads are different */
+@media only screen
+and (min-device-width : 375px)
+and (max-device-width : 667px) {
+  .groopy-search-icon {
+    top:5px;
+    left:-1px;
+  }
+}
+ /* iphone 6 plus */
+@media only screen
+and (min-device-width : 414px)
+and (max-device-width : 736px) {
+  .groopy-search-icon {
+    top:5px;
+    left:-1px;
+  }
+}
+
+/* iPhone */
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px)  {
+  .groopy-search-icon {
+    top:5px;
+    left:-1px;
+  }
+}
+
 
 .fa-search {
   color:#404040;
