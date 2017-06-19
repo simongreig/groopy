@@ -218,6 +218,45 @@ app.get('/photos', function (req, res) {
   });
 });
 
+//******************************************************************************
+//
+// Returns the detail of the faves for a photo.
+// Example:
+// http://localhost:6002/faves/34865737241
+//
+//******************************************************************************
+app.get('/faves/:photo_id', function (req, res) {
+
+  // Check if the user is logged on.  If they are not then it will
+  // initiate the oauth flow.
+  if (!req.cookies.groopy) {
+    res.end(JSON.stringify({"stat":"fail", "code":"999","message":"Not logged on"}));
+    return;
+  } else {
+    // Refresh the cookie expiry.
+    req.cookies.groopy.maxAge = 28 * 24 * 3600000; // 4 weeks
+  }
+
+  var params = {
+    api_key: flickrOptions.api_key,
+    user_id: req.cookies.groopy.user_id,
+    photo_id: req.params.photo_id
+  } ;
+
+  var start = new Date().getTime();
+  flickr.get('?method=flickr.photos.getFavorites', {
+    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
+    qs:params
+  },function (err, inres, body) {
+    if (err) {
+      res.send(JSON.stringify(err));
+    } else {
+      body.flickr_time_taken = new Date().getTime() - start;
+      res.send(JSON.stringify(body));
+    }
+  });
+});
+
 
 //******************************************************************************
 //
