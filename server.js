@@ -179,7 +179,7 @@ app.get('/photos', function (req, res) {
     api_key: flickrOptions.api_key,
     user_id: req.cookies.groopy.user_id,
     privacy_filter: 1,
-    extras: "views, url_q"
+    extras: "views, url_q, count_faves"
   } ;
 
   if (req.query.group_id) {
