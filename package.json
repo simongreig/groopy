@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "description": "Groopy app",
   "author": "Simon Greig <simon.greig@gmail.com>",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node src/server.js"
   },
   "dependencies": {
     "cfenv": "^1.0.3",
