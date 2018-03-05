@@ -81,7 +81,8 @@ const app = express();
 //});
 
 // Map the public directory
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/../public'));
+
 
 
 app.use(cookieSession({
