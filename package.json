@@ -1,25 +1,21 @@
 {
   "name": "groopy_web_app",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Groopy app",
-  "author": "Simon Greig <simon.greig@gmail.com>",
-  "main": "src/server.js",
+  "private": true,
   "scripts": {
-    "start": "NODE_ENV=production node src/server.js"
+    "start": "NODE_ENV=prod node ./bin/www",
+    "test": "NODE_ENV=local node ./bin/www"
   },
   "dependencies": {
-    "cfenv": "^1.0.3",
     "compression": "^1.6.1",
     "cookie-parser": "^1.4.1",
     "cookie-session": "^2.0.0-alpha.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "grant-express": "^3.5.5",
+    "habitat": "^3.1.2",
     "helmet": "^3.4.0",
     "purest": "^2.0.1"
-  },
-  "repository": {},
-  "engines": {
-    "node": "4.2.x"
   }
 }
