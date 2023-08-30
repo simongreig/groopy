@@ -1,15 +1,7 @@
   angular.module('groopyApp', ['ngAnimate', 'ui.bootstrap', 'ngCookies']);
   angular.module('groopyApp').controller('GroopyController', function($scope, $location, $timeout, $http, $q, $window, $sce, $cookies){
 
-    //
-    // Find out if the host is localhost and disable Google Analytics if it is
-    //
-    $scope.useGoogleAnalytics = true;
-    if ($location.host() == "localhost") {
-      $scope.useGoogleAnalytics = false;
-    }
-
-
+  
     // Used to force a look up when the page is loaded for the first ever time
     // added because the new watch logic to minimise accidental fetches is too
     // restrictive.
