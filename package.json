@@ -15,7 +15,7 @@
     "express-session": "^1.13.0",
     "grant-express": "^3.5.5",
     "habitat": "^3.1.2",
-    "helmet": "^3.4.0",
+    "helmet": "^7.0.0",
     "purest": "^2.0.1"
   }
 }
