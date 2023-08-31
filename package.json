@@ -13,7 +13,7 @@
     "cookie-session": "^2.0.0-alpha.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
-    "grant-express": "^3.5.5",
+    "grant": "^5.4.21",
     "habitat": "^3.1.2",
     "helmet": "^7.0.0",
     "purest": "^2.0.1"

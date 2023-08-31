@@ -4,10 +4,11 @@ console.log ("Running in NODE_ENV=" + process.env.NODE_ENV);
 
 const express = require('express');
 var cookieSession = require('cookie-session');
-var Grant = require('grant-express');
+//var Grant = require('grant-express');
 var cookieParser = require('cookie-parser');
 var Purest = require('purest');
 var compression = require('compression');
+var Grant = require('grant').express()
 
 
 // NOTE: Groopy needs two .env files to run.  .env.local and .env.prod
@@ -28,16 +29,14 @@ const PORT = 8080;
 // Load the Grant and Purest libraries used for auth and comms.
 var grant = new Grant (
   {
-    "server": {
-    "protocol": flickrOptions.protocol,
-    "host": flickrOptions.host,
-    "callback": flickrOptions.callback,
-    "transport": "querystring",
-    "state": false   // Not needed for OAUTH1
+    "defaults": {
+      "origin": flickrOptions.origin,
+      "transport": "querystring"
     },
     "flickr": {
       "key": flickrOptions.api_key,
       "secret": flickrOptions.api_secret,
+      "callback": flickrOptions.callback,
       "scope": [flickrOptions.permissions]
     }
   }
