@@ -4,11 +4,10 @@ console.log ("Running in NODE_ENV=" + process.env.NODE_ENV);
 
 const express = require('express');
 var cookieSession = require('cookie-session');
-//var Grant = require('grant-express');
 var cookieParser = require('cookie-parser');
-var Purest = require('purest');
 var compression = require('compression');
 var Grant = require('grant').express()
+const Flickr = require('flickr-sdk')
 
 
 // NOTE: Groopy needs two .env files to run.  .env.local and .env.prod
@@ -19,7 +18,6 @@ var habitat = require("habitat"),
     flickrOptions = env.get("FLICKR");
 
 console.log ("Loaded options:", flickrOptions);
-
 
 
 // Constants
@@ -42,24 +40,11 @@ var grant = new Grant (
   }
 );
 
-var flickr = new Purest({
-  provider:'flickr',
-  key: flickrOptions.api_key,
-  secret: flickrOptions.api_secret}) ;
-
-
-
-
-
-
-
 // App
 const app = express();
 
 var path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
-
-
 
 app.use(cookieSession({
   name: 'groopy-session-default',
@@ -81,22 +66,19 @@ app.use(compression());
 
 //******************************************************************************
 //
-// This route only exists in order to quickly test the Flickr API is working
+// Helper function to instantiate a new flickr connection object using the
+// tokens and things from the request message.  Need to use the request tokens
+// to support multiple users.
 //
 //******************************************************************************
-app.get('/flickr_test', function (req, res) {
-  // call flickr.test.login
-  flickr.get('?method=flickr.test.login', {
-    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
-    qs:{api_key:flickrOptions.api_key}
-  },function (err, inres, body) {
-    if (err) {
-      res.end(JSON.stringify(err));
-    } else {
-      res.end(JSON.stringify(body));
-    }
-  });
-});
+function frickr(req) {
+  return new Flickr(Flickr.OAuth.createPlugin(
+    flickrOptions.api_key,
+    flickrOptions.api_secret,
+    req.cookies.groopy.access_token,
+    req.cookies.groopy.access_secret
+  ));
+}
 
 
 //******************************************************************************
@@ -128,6 +110,20 @@ app.get('/logout', function(req,res){
   // TODO this should be one cookie storing an object.
   res.clearCookie('groopy');
   res.send('Logged out');
+});
+
+
+//******************************************************************************
+//
+// This route only exists in order to quickly test the Flickr API is working
+//
+//******************************************************************************
+app.get('/flickr_test', function (req, res) {
+  frickr(req).test.login().then(function (resp) {
+    res.end(JSON.stringify(resp.body));
+  }).catch(function (err) {
+    res.end(JSON.stringify(err));
+  });
 });
 
 
@@ -183,16 +179,11 @@ app.get('/photos', function (req, res) {
   }
 
   var start = new Date().getTime();
-  flickr.get('?method=flickr.photos.search', {
-    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
-    qs:params
-  },function (err, inres, body) {
-    if (err) {
-      res.end(JSON.stringify(err));
-    } else {
-      body.flickr_time_taken = new Date().getTime() - start;
-      res.end(JSON.stringify(body));
-    }
+  frickr(req).photos.search(params).then(function (resp) {
+    resp.body.flickr_time_taken = new Date().getTime() - start;
+    res.end(JSON.stringify(resp.body));
+  }).catch(function (err) {
+    res.end(JSON.stringify(err));
   });
 });
 
@@ -222,16 +213,11 @@ app.get('/faves/:photo_id', function (req, res) {
   } ;
 
   var start = new Date().getTime();
-  flickr.get('?method=flickr.photos.getFavorites', {
-    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
-    qs:params
-  },function (err, inres, body) {
-    if (err) {
-      res.send(JSON.stringify(err));
-    } else {
-      body.flickr_time_taken = new Date().getTime() - start;
-      res.send(JSON.stringify(body));
-    }
+  frickr(req).photos.getFavorites(params).then(function (resp) {
+    resp.body.flickr_time_taken = new Date().getTime() - start;
+    res.end(JSON.stringify(resp.body));
+  }).catch(function (err) {
+    res.end(JSON.stringify(err));
   });
 });
 
@@ -262,20 +248,14 @@ app.get('/photo/:photo_id', function (req, res) {
     photo_id: req.params.photo_id
   } ;
 
-  var start = new Date().getTime();
 
-  flickr.get('?method=flickr.photos.getAllContexts', {
-    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
-    qs:params
-  },function (err, inres, body) {
-    if (err) {
-      res.end(JSON.stringify(err));
-    } else {
-      body.id = req.params.photo_id;
-      body.flickr_time_taken = new Date().getTime() - start;
-      var response = JSON.stringify(body);
-      res.end(JSON.stringify(body));
-    }
+  var start = new Date().getTime();
+  frickr(req).photos.getAllContexts(params).then(function (resp) {
+    resp.body.id = req.params.photo_id;
+    resp.body.flickr_time_taken = new Date().getTime() - start;
+    res.end(JSON.stringify(resp.body));
+  }).catch(function (err) {
+    res.end(JSON.stringify(err));
   });
 });
 
@@ -302,72 +282,50 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
   result.from_pool = req.params.from_pool;
   result.to_pool = req.params.to_pool;
 
-//    console.log("***ACTUAL UPDATE COMMENTED OUT FOR TEST***");
-
   var params = {
     api_key: flickrOptions.api_key,
     photo_id: req.params.photo_id,
     group_id: req.params.to_pool
   } ;
 
+  frickr(req).groups.pools.add(params).then(function (resp) {
+    // This is the real response.  It is either ok or fail.
+    // If the add failed (eg the photo lmit is reached) then exit now with
+    // a useful error message.
+    var body = resp.body;
+    if (body.stat == "fail") {
+      // The add failed so return the error string.
+      res.end(JSON.stringify(body));
+      return;
+    }
 
-  flickr.get('?method=flickr.groups.pools.add', {
-    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
-    qs:params
-  },function (err, inres, body)
-  {
-    if (err) {
-      // This is only valid if there is a connection error with Flickr.
-      // Should never really happen.  Abort now in case of further damage.
-      console.log ("Add error:", JSON.stringify(err));
-      res.end(JSON.stringify(err));
-    } else {
+    // Ok so still here then?  If so then the add worked and time to do the remove
+    if (req.params.from_pool != "undefined") {
+      var params = {
+        api_key: flickrOptions.api_key,
+        photo_id: req.params.photo_id,
+        group_id: req.params.from_pool
+      } ;
 
-      // This is the real response.  It is either ok or fail.
-      // If the add failed (eg the photo lmit is reached) then exit now with
-      // a useful error message.
-      if (body.stat == "fail") {
-        // The add failed so return the error string.
-        res.end(JSON.stringify(body));
-        return;
-      }
+      frickr(req).groups.pools.remove(params).then(function (resp) {
+        var body = resp.body;
+        if (!body) {
+          var resultbody = {};
+          resultbody.id = req.params.photo_id;
+          resultbody.stat = "ok";
+          res.end(JSON.stringify(resultbody));
+        } else {
+          body.id = req.params.photo_id;
+          res.end(JSON.stringify(body));
+        }
+      }).catch(function (err) {
+        res.end(JSON.stringify(err));
+      });
 
-      // Ok so still here then?  If so then the add worked and time to do the remove
-      if (req.params.from_pool != "undefined") {
-        var params = {
-          api_key: flickrOptions.api_key,
-          photo_id: req.params.photo_id,
-          group_id: req.params.from_pool
-        } ;
-
-        flickr.get('?method=flickr.groups.pools.remove', {
-          oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
-          qs:params
-        },function (err, inres, body) {
-          if (err) {
-            console.log ("Remove error:", JSON.stringify(err));
-            res.end(JSON.stringify(err));
-          } else {
-            if (!body) {
-              // For some reason Flickr has stopped returning a body
-//              console.log ("Remove error, NO BODY:", JSON.stringify(body));
-              var resultbody = {};
-              resultbody.id = req.params.photo_id;
-              resultbody.stat = "ok";
-              res.end(JSON.stringify(resultbody));
-            } else {
-              body.id = req.params.photo_id;
-              res.end(JSON.stringify(body));
-            }
-          }
-        });
-      } else {
-        body.id=req.params.photo_id;
-        res.end(JSON.stringify(body));
-      }
-     }
-   });
-
+    };
+  }).catch(function (err) {
+     res.end(JSON.stringify(err));
+  });
 });
 
 //******************************************************************************
@@ -396,18 +354,12 @@ app.get('/group/:group_id', function (req, res) {
     group_id: req.params.group_id
   } ;
 
-  flickr.get('?method=flickr.groups.join', {
-    oauth:{token: req.cookies.groopy.access_token, secret: req.cookies.groopy.access_secret},
-    qs:params
-  },function (err, inres, body) {
-    if (err) {
-      res.end(JSON.stringify(err));
-    } else {
-      body.id = req.params.photo_id;
-      var response = JSON.stringify(body);
-      body.group_id = req.params.group_id;
-      res.end(JSON.stringify(body));
-    }
+  frickr(req).groups.join(params).then(function (resp) {
+    resp.body.id = req.params.photo_id;
+    resp.body.group_id = req.params.group_id;
+    res.end(JSON.stringify(resp.body));
+  }).catch(function (err) {
+    res.end(JSON.stringify(err));
   });
 });
 
@@ -418,7 +370,7 @@ app.get('/group/:group_id', function (req, res) {
 // provide a search string.  All it does is call index.html with a parameter
 // which is then picked up.
 // e.g. http://localhost:6002/car
-// Whill search for cars
+// Will search for cars
 //
 // Returns "stat":"ok" if it worked.
 // Returned "stat":"fail" if something went wrong.
