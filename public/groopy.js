@@ -1,7 +1,7 @@
   angular.module('groopyApp', ['ngAnimate', 'ui.bootstrap', 'ngCookies']);
   angular.module('groopyApp').controller('GroopyController', function($scope, $location, $timeout, $http, $q, $window, $sce, $cookies){
 
-  
+
     // Used to force a look up when the page is loaded for the first ever time
     // added because the new watch logic to minimise accidental fetches is too
     // restrictive.
@@ -634,6 +634,9 @@
           if (response.data.stat == "ok") {
             // Hide the boxes to show that the action has completed
             $scope.boxType[response.data.id] = null;
+
+            // Clear the error message
+            $scope.error_string = "";
           } else {
             // Show an error alert with the error string
             // Error message is in response.data.message
@@ -647,6 +650,8 @@
               $scope.error_string = "Your photo is already in the pool, please make sure that the photo is only in ONE Views group.";
             } else if (response.data.code == "5") {
               $scope.error_string = "You have reached today's limit for adding photos to this group.  Try again tomorrow.";
+            } else if (response.data.code == "8") {
+              $scope.error_string = "Image not allowed, check the photo's safety level.";
             } else {
               $scope.error_string = response.data.message;
             }

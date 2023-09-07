@@ -288,8 +288,6 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
     group_id: req.params.to_pool
   } ;
 
-
-
   frickr(req).groups.pools.add(params).then(function (resp) {
     // This is the real response.  It is either ok or fail.
     // If the add failed (eg the photo lmit is reached) then exit now with
@@ -332,7 +330,8 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
       res.end(JSON.stringify(body));
     }
   }).catch(function (err) {
-     res.end(JSON.stringify(err));
+    err.id=req.params.photo_id;
+    res.end(JSON.stringify(err));
   });
 });
 
