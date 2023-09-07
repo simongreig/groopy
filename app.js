@@ -288,11 +288,14 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
     group_id: req.params.to_pool
   } ;
 
+
+
   frickr(req).groups.pools.add(params).then(function (resp) {
     // This is the real response.  It is either ok or fail.
     // If the add failed (eg the photo lmit is reached) then exit now with
     // a useful error message.
     var body = resp.body;
+
     if (body.stat == "fail") {
       // The add failed so return the error string.
       res.end(JSON.stringify(body));
@@ -300,6 +303,8 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
     }
 
     // Ok so still here then?  If so then the add worked and time to do the remove
+    // If the 'from pool' is undefined then don't bother to do the remove, just
+    // respond back as part of the ELSE statement.
     if (req.params.from_pool != "undefined") {
       var params = {
         api_key: flickrOptions.api_key,
@@ -322,7 +327,10 @@ app.get('/move/:photo_id/:from_pool/:to_pool', function (req, res) {
         res.end(JSON.stringify(err));
       });
 
-    };
+    } else {
+      body.id=req.params.photo_id;
+      res.end(JSON.stringify(body));
+    }
   }).catch(function (err) {
      res.end(JSON.stringify(err));
   });
