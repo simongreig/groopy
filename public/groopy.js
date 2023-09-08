@@ -316,6 +316,20 @@
       }
       $scope.httpAborter = $q.defer();
 
+      // Find if there is a site message to display
+      var messageURL = GetBaseURL() + "/message" ;
+      $http.get(messageURL, {timeout: $scope.httpAborter.promise}).then(function(response){
+
+        var msgdiv = document.getElementById("groopy-site-message");
+          if (response.data === "") {
+            msgdiv.style.display = "none";
+          } else {
+            msgdiv.style.display = "block";
+          }
+        $scope.site_message = response.data;
+      });
+
+
       // Build the search params
       var querystring = {
         sort: $scope.sort.api,

@@ -370,6 +370,17 @@ app.get('/group/:group_id', function (req, res) {
   });
 });
 
+//******************************************************************************
+//
+// Returns the value of the message environment variable:  'GROOPY_MSG'
+//
+//******************************************************************************
+app.get('/message', function(req,res){
+  res.send(process.env.GROOPY_MSG);
+});
+
+
+
 
 //******************************************************************************
 //
@@ -398,6 +409,10 @@ app.get('/:text', function (req, res) {
   res.redirect('/#/' + req.params.text);
 
 });
+
+
+
+
 
 
 module.exports = app;

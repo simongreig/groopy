@@ -419,6 +419,26 @@ a.goodbyeLink:link {
   text-align: center;
 }
 
+.groopy-site-message {
+  width: 100%;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  background: #005FDF;
+  text-align: center;
+  color: #FFFFFF;
+  font-family: sans-serif;
+  font-weight: lighter;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.groopy-site-message-inner {
+  width: 750px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .pagination>.active>a {
   border-color:#404040;
   background-color: #404040;
