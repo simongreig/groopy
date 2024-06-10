@@ -16,20 +16,20 @@ The app is deployed in AWS Lightsail with a Lightsale managed domain.  This mean
 It is all pull at the moment from GitHub.  This is how to do a clean install:
 
 1. Go to the Lightsail console at AWS and click connect to instance
-2. On the SSH terminal 'cd /opt/bitnami/projects'
-3. Refresh the code 'git clone https://github.com/simongreig/groopy'
-4. Go into the app 'cd groopy'
-5. Refresh the install 'npm install'
+2. On the SSH terminal `cd /opt/bitnami/projects`
+3. Refresh the code `git clone https://github.com/simongreig/groopy`
+4. Go into the app `cd groopy`
+5. Refresh the install `npm install`
 
 ### Manual Updates
 
 It is all pull at the moment from GitHub.  This is how to do a refresh from the master repo:
 
 1. Go to the Lightsail console at AWS and click connect to instance
-2. On the SSH terminal 'cd /opt/bitnami/projects/groopy'
-3. Refresh the code 'git pull'  **NOTE THIS IS UNTESTED - UDATE THESE NOTES WHEN A CODE CHANGE IS DEPLOYED**
-4. Find and stop the service:  'forever list' then 'forever stop 0' (replace '0' with whatever 'forever list' responds to
-5. Restart the service: 'NODE_ENV=prod forever start ./bin/www'
+2. On the SSH terminal `cd /opt/bitnami/projects/groopy`
+3. Refresh the code 'git pull'  **NOTE THIS IS UNTESTED - UPDATE THESE NOTES WHEN A CODE CHANGE IS DEPLOYED**
+4. Find and stop the service:  `forever list` then `forever stop 0` (replace `0` with whatever `forever list` responds to
+5. Restart the service: `NODE_ENV=prod forever start ./bin/www`
 
 
 
