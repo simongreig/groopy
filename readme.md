@@ -27,7 +27,7 @@ It is all pull at the moment from GitHub.  This is how to do a refresh from the 
 
 1. Go to the Lightsail console at AWS and click connect to instance
 2. On the SSH terminal `cd /opt/bitnami/projects/groopy`
-3. Refresh the code 'git pull'  **NOTE THIS IS UNTESTED - UPDATE THESE NOTES WHEN A CODE CHANGE IS DEPLOYED**
+3. Refresh the code `git pull`  **NOTE THIS IS UNTESTED - UPDATE THESE NOTES WHEN A CODE CHANGE IS DEPLOYED**
 4. Find and stop the service:  `forever list` then `forever stop 0` (replace `0` with whatever `forever list` responds to
 5. Restart the service: `NODE_ENV=prod forever start ./bin/www`
 
